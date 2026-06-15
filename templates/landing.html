@@ -22,6 +22,7 @@
             <a href="{{ url_for('register') }}" class="btn-primary">Start tracking free</a>
             <a href="{{ url_for('login') }}" class="btn-primary">Sign in</a>
         </div>
+        <button class="hero-demo-trigger" id="demoTrigger">See how it works</button>
     </div>
     <div class="hero-visual">
         <div class="preview-frame">
@@ -108,5 +109,14 @@
         <a href="{{ url_for('register') }}" class="btn-primary">Create free account</a>
     </div>
 </section>
+
+<div class="modal-overlay" id="demoModal">
+    <div class="modal-content">
+        <button class="modal-close" id="modalClose">&times;</button>
+        <div class="modal-video-wrap">
+            <iframe id="demoVideo" src="" title="Spendly demo" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+    </div>
+</div>
 
 {% endblock %}
