@@ -1,7 +1,9 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request, redirect, url_for, session
+from werkzeug.security import generate_password_hash
 from database.db import get_db, init_db, seed_db
 
 app = Flask(__name__)
+app.secret_key = "spendly-dev-secret-key"
 
 with app.app_context():
     init_db()
@@ -27,8 +29,43 @@ def privacy():
     return render_template("privacy.html")
 
 
-@app.route("/register")
+@app.route("/register", methods=["GET", "POST"])
 def register():
+    if request.method == "POST":
+        name = request.form.get("name", "").strip()
+        email = request.form.get("email", "").strip()
+        password = request.form.get("password", "")
+
+        error = None
+        if not name:
+            error = "Name is required"
+        elif "@" not in email:
+            error = "Enter a valid email address"
+        elif len(password) < 8:
+            error = "Password must be at least 8 characters"
+
+        if not error:
+            db = get_db()
+            existing = db.execute(
+                "SELECT id FROM users WHERE email = ?", (email,)
+            ).fetchone()
+            if existing:
+                error = "An account with this email already exists"
+            db.close()
+
+        if error:
+            return render_template("register.html", error=error, name=name, email=email)
+
+        password_hash = generate_password_hash(password)
+        db = get_db()
+        db.execute(
+            "INSERT INTO users (name, email, password_hash) VALUES (?, ?, ?)",
+            (name, email, password_hash),
+        )
+        db.commit()
+        db.close()
+        return redirect(url_for("login"))
+
     return render_template("register.html")
 
 
