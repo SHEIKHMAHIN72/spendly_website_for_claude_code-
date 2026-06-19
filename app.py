@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 from werkzeug.security import generate_password_hash, check_password_hash
 from database.db import get_db, init_db, seed_db
+from database.queries import get_user_by_id, get_summary_stats, get_recent_transactions, get_category_breakdown
 
 app = Flask(__name__)
 app.secret_key = "spendly-dev-secret-key"
@@ -110,33 +111,18 @@ def profile():
     if "user_id" not in session:
         return redirect(url_for("login"))
 
-    user = {
-        "name": "Demo User",
-        "email": "demo@spendly.com",
-        "member_since": "January 15, 2025",
-        "initials": "DU",
-    }
-    stats = {
-        "total_spent": 12450,
-        "transaction_count": 42,
-        "top_category": "Food",
-    }
-    transactions = [
-        {"date": "15 Apr 2025", "description": "Weekly groceries",   "category": "Food",         "amount": 450},
-        {"date": "12 Apr 2025", "description": "Metro recharge",     "category": "Transport",    "amount": 150},
-        {"date": "10 Apr 2025", "description": "Electricity bill",   "category": "Bills",        "amount": 1200},
-        {"date": "08 Apr 2025", "description": "Pharmacy",           "category": "Health",       "amount": 300},
-        {"date": "05 Apr 2025", "description": "Movie tickets",      "category": "Entertainment","amount": 500},
-        {"date": "02 Apr 2025", "description": "New headphones",     "category": "Shopping",     "amount": 1800},
-    ]
-    categories = [
-        {"name": "Food",         "total": 3200, "percentage": 32},
-        {"name": "Bills",        "total": 2800, "percentage": 28},
-        {"name": "Transport",    "total": 1800, "percentage": 18},
-        {"name": "Health",       "total": 1200, "percentage": 12},
-        {"name": "Entertainment","total": 800,   "percentage": 8},
-        {"name": "Shopping",     "total": 500,   "percentage": 5},
-    ]
+    user_id = session["user_id"]
+    user = get_user_by_id(user_id)
+    if not user:
+        session.clear()
+        return redirect(url_for("login"))
+
+    initials = "".join(part[0].upper() for part in user["name"].split() if part)
+    user["initials"] = initials
+
+    stats = get_summary_stats(user_id)
+    transactions = get_recent_transactions(user_id)
+    categories = get_category_breakdown(user_id)
 
     return render_template(
         "profile.html",

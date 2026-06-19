@@ -65,9 +65,9 @@
     <div class="category-row cat-{{ cat.name|lower }}">
       <span class="category-name">{{ cat.name }}</span>
       <div class="category-bar-track">
-        <div class="category-bar-fill" style="width:{{ cat.percentage }}%;"></div>
+        <div class="category-bar-fill" style="width:{{ cat.pct }}%;"></div>
       </div>
-      <span class="category-amount">₹{{ "{:,}".format(cat.total) }}</span>
+      <span class="category-amount">₹{{ "{:,}".format(cat.amount) }}</span>
     </div>
     {% endfor %}
   </div>

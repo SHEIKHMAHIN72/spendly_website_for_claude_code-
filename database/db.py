@@ -55,14 +55,14 @@ def seed_db():
 
     today = date.today()
     seed_expenses = [
-        (user_id, 450.0, "Food", (today - timedelta(days=28)).isoformat(), "Weekly groceries"),
-        (user_id, 150.0, "Transport", (today - timedelta(days=25)).isoformat(), "Metro recharge"),
-        (user_id, 1200.0, "Bills", (today - timedelta(days=21)).isoformat(), "Electricity bill"),
-        (user_id, 300.0, "Health", (today - timedelta(days=18)).isoformat(), "Pharmacy"),
-        (user_id, 500.0, "Entertainment", (today - timedelta(days=14)).isoformat(), "Movie tickets"),
-        (user_id, 1800.0, "Shopping", (today - timedelta(days=10)).isoformat(), "New headphones"),
-        (user_id, 75.0, "Food", (today - timedelta(days=7)).isoformat(), "Morning coffee"),
-        (user_id, 200.0, "Other", (today - timedelta(days=3)).isoformat(), "Gift wrapping"),
+        (user_id, 45.50, "Food", (today - timedelta(days=28)).isoformat(), "Weekly groceries"),
+        (user_id, 35.00, "Transport", (today - timedelta(days=25)).isoformat(), "Metro recharge"),
+        (user_id, 120.00, "Bills", (today - timedelta(days=21)).isoformat(), "Electricity bill"),
+        (user_id, 25.00, "Health", (today - timedelta(days=18)).isoformat(), "Pharmacy"),
+        (user_id, 30.00, "Entertainment", (today - timedelta(days=14)).isoformat(), "Movie tickets"),
+        (user_id, 55.00, "Shopping", (today - timedelta(days=10)).isoformat(), "New headphones"),
+        (user_id, 15.74, "Food", (today - timedelta(days=7)).isoformat(), "Morning coffee"),
+        (user_id, 20.00, "Other", (today - timedelta(days=3)).isoformat(), "Gift wrapping"),
     ]
 
     conn.executemany(
