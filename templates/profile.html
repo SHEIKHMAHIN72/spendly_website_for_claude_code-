@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}Profile — Spendly{% endblock %}
+
+{% block content %}
+
+<section class="profile-page">
+
+  <div class="profile-card">
+    <div class="profile-avatar">{{ user.initials }}</div>
+    <div class="profile-details">
+      <h1 class="profile-name">{{ user.name }}</h1>
+      <p class="profile-email">{{ user.email }}</p>
+      <p class="profile-meta">Member since {{ user.member_since }}</p>
+    </div>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-item">
+      <i data-lucide="indian-rupee" style="width:20px;height:20px;color:var(--accent);margin-bottom:4px;"></i>
+      <span class="stat-label">Total Spent</span>
+      <span class="stat-number">₹{{ "{:,}".format(stats.total_spent) }}</span>
+    </div>
+    <div class="stat-item">
+      <i data-lucide="list" style="width:20px;height:20px;color:var(--accent);margin-bottom:4px;"></i>
+      <span class="stat-label">Transactions</span>
+      <span class="stat-number">{{ stats.transaction_count }}</span>
+    </div>
+    <div class="stat-item">
+      <i data-lucide="trending-up" style="width:20px;height:20px;color:var(--accent);margin-bottom:4px;"></i>
+      <span class="stat-label">Top Category</span>
+      <span class="stat-text">{{ stats.top_category }}</span>
+    </div>
+  </div>
+
+  <div class="tx-table-wrap">
+    <h2 class="section-heading"><i data-lucide="arrow-up-right" style="width:18px;height:18px;vertical-align:middle;"></i> Recent transactions</h2>
+    <table class="tx-table">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Description</th>
+          <th>Category</th>
+          <th class="tx-amount">Amount</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for tx in transactions %}
+        <tr>
+          <td>{{ tx.date }}</td>
+          <td>{{ tx.description }}</td>
+          <td><span class="badge badge-{{ tx.category|lower }}">{{ tx.category }}</span></td>
+          <td class="tx-amount">₹{{ "{:,}".format(tx.amount) }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="category-breakdown">
+    <h2 class="section-heading" style="padding:0 0 0.75rem 0;margin:0;">
+      <i data-lucide="pie-chart" style="width:18px;height:18px;vertical-align:middle;"></i> Spending by category
+    </h2>
+    {% for cat in categories %}
+    <div class="category-row cat-{{ cat.name|lower }}">
+      <span class="category-name">{{ cat.name }}</span>
+      <div class="category-bar-track">
+        <div class="category-bar-fill" style="width:{{ cat.percentage }}%;"></div>
+      </div>
+      <span class="category-amount">₹{{ "{:,}".format(cat.total) }}</span>
+    </div>
+    {% endfor %}
+  </div>
+
+</section>
+
+{% endblock %}
