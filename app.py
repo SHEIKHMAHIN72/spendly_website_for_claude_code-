@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for, session, f
 from werkzeug.security import generate_password_hash, check_password_hash
 from database.db import get_db, init_db, seed_db
 from database.queries import get_user_by_id, get_summary_stats, get_recent_transactions, get_category_breakdown
+from datetime import date, datetime, timedelta
 
 app = Flask(__name__)
 app.secret_key = "spendly-dev-secret-key"
@@ -120,9 +121,48 @@ def profile():
     initials = "".join(part[0].upper() for part in user["name"].split() if part)
     user["initials"] = initials
 
-    stats = get_summary_stats(user_id)
-    transactions = get_recent_transactions(user_id)
-    categories = get_category_breakdown(user_id)
+    date_from_s = request.args.get("date_from", "").strip()
+    date_to_s = request.args.get("date_to", "").strip()
+
+    date_from = None
+    date_to = None
+
+    if date_from_s:
+        try:
+            date_from = datetime.strptime(date_from_s, "%Y-%m-%d").date()
+        except ValueError:
+            date_from = None
+
+    if date_to_s:
+        try:
+            date_to = datetime.strptime(date_to_s, "%Y-%m-%d").date()
+        except ValueError:
+            date_to = None
+
+    if date_from and date_to and date_from > date_to:
+        flash("Start date must be before end date.")
+        date_from = None
+        date_to = None
+
+    today = date.today()
+    presets = {
+        "this_month": {"date_from": today.replace(day=1).isoformat(), "date_to": today.isoformat()},
+        "last_3_months": {"date_from": (today - timedelta(days=90)).isoformat(), "date_to": today.isoformat()},
+        "last_6_months": {"date_from": (today - timedelta(days=180)).isoformat(), "date_to": today.isoformat()},
+    }
+
+    active_preset = None
+    if date_from and date_to:
+        date_from_str = date_from.isoformat()
+        date_to_str = date_to.isoformat()
+        for key, val in presets.items():
+            if val["date_from"] == date_from_str and val["date_to"] == date_to_str:
+                active_preset = key
+                break
+
+    stats = get_summary_stats(user_id, date_from, date_to)
+    transactions = get_recent_transactions(user_id, 10, date_from, date_to)
+    categories = get_category_breakdown(user_id, date_from, date_to)
 
     return render_template(
         "profile.html",
@@ -130,6 +170,10 @@ def profile():
         stats=stats,
         transactions=transactions,
         categories=categories,
+        date_from=date_from.isoformat() if date_from else "",
+        date_to=date_to.isoformat() if date_to else "",
+        active_preset=active_preset,
+        presets=presets,
     )
 
 
